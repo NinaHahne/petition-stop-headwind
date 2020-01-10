@@ -57,6 +57,5 @@ function drawCircle() {
 }
 
 function drawDot() {
-    // ctx.fillRect(mouseXstart,mouseYstart,1,1);
-    ctx.strokeRect(mouseXstart,mouseYstart,0.2,0.2);
+    ctx.fillRect(mouseXstart-1,mouseYstart-1,2,2);
 }
