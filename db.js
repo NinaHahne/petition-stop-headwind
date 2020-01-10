@@ -12,3 +12,7 @@ exports.addName = function(first, last, sig) {
         [first, last, sig]
     );
 };
+
+exports.getSig = function(id) {
+    return db.query(`SELECT signature FROM signatures WHERE id = $1`, [id]).then(({ rows }) => rows);
+};

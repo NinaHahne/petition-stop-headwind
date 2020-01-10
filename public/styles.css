@@ -1,3 +1,20 @@
+#wind-vs-bike > img {
+    position: relative;
+}
+#headwind-sucks {
+    position: relative;
+    display: inline-block;
+    width: 180px;
+    height: 180px;
+}
+#headwind-sucks img {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+#ban {
+    height: 100%;
+}
 canvas {
     border: 2px solid midnightblue;
     background-color: powderblue;

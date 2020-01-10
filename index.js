@@ -2,16 +2,22 @@ const express       = require('express');
 const app           = express();
 const hb            = require('express-handlebars');
 
+const {SESSION_SECRET:sessionSecret} = require('./secrets');
+
 // const cookieParser  = require('cookie-parser');
 // cookie-parser is gone now! we now use cookie session:
 const cookieSession = require('cookie-session');
+const csurf = require('csurf');
 
 
-const { getNames, addName } = require("./db");
+const { getNames, addName, getSig } = require("./db");
 
 // this configures express to use express-handlebars:
 app.engine('handlebars', hb());
 app.set('view engine', 'handlebars');
+
+// let's you link to the styles.css in public folder:
+app.use(express.static('./public'));
 
 // middleware function, that grabs user input, parses it and makes it available to req.body:
 app.use(
@@ -20,18 +26,24 @@ app.use(
     })
 );
 
-// let's you link to the styles.css in public folder:
-app.use(express.static('./public'));
-
 // app.use(cookieParser());
+// app.use(cookieSession({
+//     secret: `I'm always hungry.`,
+//     maxAge: 1000 * 60 * 60 * 24 * 14
+// }));
+
 app.use(cookieSession({
-    secret: `I'm always hungry.`,
+    secret: sessionSecret,
     maxAge: 1000 * 60 * 60 * 24 * 14
 }));
 
-// let's you serve your static files
-// app.use(express.static('./assets'));
+app.use(csurf());
 
+app.use(function(req, res, next) {
+    res.set('x-frame-options', 'DENY');
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
 
 app.get('/', (req, res) => {
     console.log("*************** / Route ***********");
@@ -57,6 +69,9 @@ app.post('/petition', (req, res) => {
     // console.log(`your name is: ${req.body.first} ${req.body.last}`);
     addName(req.body.first, req.body.last, req.body.sig).then((result) => {
         console.log('result which includes the RETURNING data: ', result);
+        // GET ACTUAL ID HERE...
+        let id = 1;
+        req.session.signatureId = id;
         res.redirect('/thanks');
     }
     ).catch(err => {
@@ -70,9 +85,23 @@ app.post('/petition', (req, res) => {
 });
 
 app.get('/thanks', (req, res) => {
-    res.render('thanks', {
-        layout: 'main'
+    req.session.signatureId = 1;
+    console.log("*************** /thanks Route ***********");
+    console.log('req.session.signatureId: ', req.session.signatureId);
+    console.log("*************** /thanks Route ***********");
+    let signatureId = req.session.signatureId;
+
+    getSig(signatureId).then(result => {
+        let sigUrl = result[0].signature;
+        // console.log('sigUrl: ', sigUrl);
+        res.render('thanks', {
+            layout: 'main',
+            sigUrl
+        });
+    }).catch(err => {
+        console.log(err);
     });
+
 });
 
 app.get('/signers', (req, res) => {

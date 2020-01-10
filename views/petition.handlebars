@@ -1,9 +1,10 @@
 {{#if err}}
-<div class="err">oops!</div>
+<div class="err">oops! please try again!</div>
 {{/if}}
 <form class="" method="post">
     <input type="text" name="first" placeholder="first name">
     <input type="text" name="last" placeholder="last name">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <input id="sig" type="hidden" name="sig">
     <!-- <input id="sig" type="text" name="sig" placeholder="signature"> -->
     <canvas id="canvas" width="350" height="100"></canvas>
