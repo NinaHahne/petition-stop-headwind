@@ -53,6 +53,7 @@ app.get('/', (req, res) => {
     console.log('req.session after setting: ', req.session);
 
     console.log("*************** / Route ***********");
+
     res.redirect('/petition');
 });
 
@@ -60,18 +61,29 @@ app.get('/petition', (req, res) => {
     console.log("*************** /petition Route ***********");
     console.log('this is the cookie session in petition route: ', req.session);
     console.log("*************** /petition Route ***********");
-    res.render('petition', {
-        layout: 'main'
-    });
+    // if user already has a signatureId in their cookies, send them to /thanks
+    if (req.session.signatureId) {
+        res.redirect('/thanks');
+    } else {
+        res.render('petition', {
+            layout: 'main'
+        });
+    }
 });
 
 app.post('/petition', (req, res) => {
     // console.log(`your name is: ${req.body.first} ${req.body.last}`);
-    addName(req.body.first, req.body.last, req.body.sig).then((result) => {
+    let timeStamp = new Date();
+    addName(req.body.first, req.body.last, req.body.sig, timeStamp).then((result) => {
+        console.log("*************** /petition POST ***********");
+        console.log('timeStamp: ', timeStamp);
         console.log('result which includes the RETURNING data: ', result);
-        // GET ACTUAL ID HERE...
-        let id = 1;
+        // GET ACTUAL ID HERE:
+        let id = result.rows[0].id;
+        console.log(id);
+
         req.session.signatureId = id;
+        console.log("*************** /petition POST ***********");
         res.redirect('/thanks');
     }
     ).catch(err => {
@@ -85,10 +97,10 @@ app.post('/petition', (req, res) => {
 });
 
 app.get('/thanks', (req, res) => {
-    req.session.signatureId = 1;
-    console.log("*************** /thanks Route ***********");
-    console.log('req.session.signatureId: ', req.session.signatureId);
-    console.log("*************** /thanks Route ***********");
+    // req.session.signatureId = 1;
+    // console.log("*************** /thanks Route ***********");
+    // console.log('req.session.signatureId: ', req.session.signatureId);
+    // console.log("*************** /thanks Route ***********");
     let signatureId = req.session.signatureId;
 
     getSig(signatureId).then(result => {

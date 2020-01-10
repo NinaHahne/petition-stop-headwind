@@ -6,10 +6,10 @@ exports.getNames = function() {
     return db.query(`SELECT * FROM signatures`).then(({ rows }) => rows);
 };
 
-exports.addName = function(first, last, sig) {
+exports.addName = function(first, last, sig, tstamp) {
     return db.query(
-        `INSERT INTO signatures (first, last, signature) VALUES ($1, $2, $3) RETURNING id`,
-        [first, last, sig]
+        `INSERT INTO signatures (first, last, signature, time_stamp) VALUES ($1, $2, $3, $4) RETURNING id`,
+        [first, last, sig, tstamp]
     );
 };
 
