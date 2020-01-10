@@ -8,7 +8,7 @@ exports.getNames = function() {
 
 exports.addName = function(first, last, sig) {
     return db.query(
-        `INSERT INTO signatures (first, last, signature) VALUES ($1, $2, $3)`,
+        `INSERT INTO signatures (first, last, signature) VALUES ($1, $2, $3) RETURNING id`,
         [first, last, sig]
     );
 };
