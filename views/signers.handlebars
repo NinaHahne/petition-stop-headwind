@@ -1,6 +1,17 @@
-<p>these people signed the petition:</p>
-<div id="signers">
+<div class="main-text">
+    <p>We the undersigned demand, that <a href="https://en.wiktionary.org/wiki/headwind" target="_blank">headwind</a> be banned on all bike lanes!</p>
+</div>
+<!-- <div id="signers">
     {{#signers}}
         <p>{{first}} {{last}}</p>
+    {{/signers}}
+</div> -->
+
+<div id="signers">
+    {{#signers}}
+        <div class="signer">
+            <p>{{first}} {{last}}</p>
+            <img src="{{signature}}" alt="signature">
+        </div>
     {{/signers}}
 </div>

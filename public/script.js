@@ -15,6 +15,7 @@ if (canvas) {
             startSignature(e);
             // draw a circle on every mousedown:
             // drawCircle();
+            drawDot();
             $canvas.on("mousemove", e => {
                 drawLine(e);
             });
@@ -53,4 +54,9 @@ function drawCircle() {
     ctx.beginPath();
     ctx.arc(mouseXstart, mouseYstart, 20, 0, 2 * Math.PI);
     ctx.stroke();
+}
+
+function drawDot() {
+    // ctx.fillRect(mouseXstart,mouseYstart,1,1);
+    ctx.strokeRect(mouseXstart,mouseYstart,0.2,0.2);
 }

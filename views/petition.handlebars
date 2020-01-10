@@ -1,3 +1,7 @@
+<div class="main-text">
+    <p>Sign our petition against <a href="https://en.wiktionary.org/wiki/headwind" target="_blank">headwind</a> on bike lanes!</p>
+</div>
+
 {{#if err}}
 <div class="err">oops! please try again!</div>
 {{/if}}
@@ -7,7 +11,8 @@
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <input id="sig" type="hidden" name="sig">
     <!-- <input id="sig" type="text" name="sig" placeholder="signature"> -->
-    <canvas id="canvas" width="350" height="100"></canvas>
+    <!-- <canvas id="canvas" width="350" height="100"></canvas> -->
+    <canvas id="canvas" width="400" height="100"></canvas>
 
     <button name="button">submit</button>
 </form>
