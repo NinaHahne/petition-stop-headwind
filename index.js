@@ -47,20 +47,25 @@ app.use(function(req, res, next) {
 
 app.get('/', (req, res) => {
     console.log("*************** / Route ***********");
-    console.log('req.session before setting: ', req.session);
+    // console.log('req.session before setting: ', req.session);
     req.session.peppermint = '<3';
     // creates two cookies: second one is an encrypred copy of the first, that makes it temper-proof
-    console.log('req.session after setting: ', req.session);
-
-    console.log("*************** / Route ***********");
-
+    // console.log('req.session after setting: ', req.session);
+    //
+    // console.log("*************** / Route ***********");
     res.redirect('/petition');
 });
 
 app.get('/petition', (req, res) => {
+    // comment everything in here out but this line to create some more signers (or just delete cookie):
+    // res.render('petition', {
+    //     layout: 'main'
+    // });
+
     console.log("*************** /petition Route ***********");
-    console.log('this is the cookie session in petition route: ', req.session);
-    console.log("*************** /petition Route ***********");
+    // console.log('this is the cookie session in petition route: ', req.session);
+    // console.log("*************** /petition Route ***********");
+
     // if user already has a signatureId in their cookies, send them to /thanks
     if (req.session.signatureId) {
         res.redirect('/thanks');
@@ -76,14 +81,14 @@ app.post('/petition', (req, res) => {
     let timeStamp = new Date();
     addName(req.body.first, req.body.last, req.body.sig, timeStamp).then((result) => {
         console.log("*************** /petition POST ***********");
-        console.log('timeStamp: ', timeStamp);
-        console.log('result which includes the RETURNING data: ', result);
+        // console.log('timeStamp: ', timeStamp);
+        // console.log('result which includes the RETURNING data: ', result);
         // GET ACTUAL ID HERE:
         let id = result.rows[0].id;
-        console.log(id);
+        // console.log(id);
 
         req.session.signatureId = id;
-        console.log("*************** /petition POST ***********");
+        // console.log("*************** /petition POST ***********");
         res.redirect('/thanks');
     }
     ).catch(err => {
@@ -98,7 +103,7 @@ app.post('/petition', (req, res) => {
 
 app.get('/thanks', (req, res) => {
     // req.session.signatureId = 1;
-    // console.log("*************** /thanks Route ***********");
+    console.log("*************** /thanks Route ***********");
     // console.log('req.session.signatureId: ', req.session.signatureId);
     // console.log("*************** /thanks Route ***********");
     let signatureId = req.session.signatureId;
@@ -118,6 +123,7 @@ app.get('/thanks', (req, res) => {
 
 app.get('/signers', (req, res) => {
     getNames().then(signers => {
+        console.log("*************** /signers Route ***********");
         // console.log(signers);
         res.render('signers', {
             layout: 'main',

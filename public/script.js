@@ -13,6 +13,8 @@ if (canvas) {
     $canvas.on("mouseenter", () => {
         $canvas.on("mousedown", e => {
             startSignature(e);
+            // draw a circle on every mousedown:
+            // drawCircle();
             $canvas.on("mousemove", e => {
                 drawLine(e);
             });
@@ -45,4 +47,10 @@ function drawLine(e) {
     ctx.stroke();
     mouseXstart = mouseX;
     mouseYstart = mouseY;
+}
+
+function drawCircle() {
+    ctx.beginPath();
+    ctx.arc(mouseXstart, mouseYstart, 20, 0, 2 * Math.PI);
+    ctx.stroke();
 }
