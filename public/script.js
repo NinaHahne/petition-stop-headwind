@@ -14,41 +14,39 @@ if (canvas) {
 
     ctx.strokeStyle = "midnightblue";
 
-    $canvas.on("mousedown", e => {
-        startSignature(e);
-        $canvas.on("mousemove", e => {
-            drawLine(e);
+    $canvas.on("mouseenter", () => {
+        $canvas.on("mousedown", e => {
+            startSignature(e);
+            $canvas.on("mousemove", e => {
+                drawLine(e);
+            });
         });
-    });
 
-    $canvas.on("mouseup", e => {
-        saveSignature(e);
+        $canvas.on("mouseup", e => {
+            saveSignature(e);
+            $canvas.unbind('mousemove');
+        });
+
+        $canvas.on("mouseleave", () => {
+            $canvas.unbind('mousemove');
+        });
     });
 
 }
 
-function startSignature() {
+function startSignature(e) {
     console.log("signature started");
-    // mouseX = e.pageX - e.target.offsetLeft;
-    // mouseY = e.pageY - e.target.offsetTop;
-    // console.log("mouseX: ", mouseX);
-    // console.log("mouseY: ", mouseY);
-    // ctx.beginPath();
-    // ctx.arc(mouseX, mouseY, 20, 0, 2 * Math.PI);
-    // ctx.stroke();
+    mouseXstart = e.pageX - e.target.offsetLeft;
+    mouseYstart = e.pageY - e.target.offsetTop;
 }
 
 function saveSignature() {
     // let dataURL = canvas.toDataURL();
     // console.log(dataURL);
     sigInput.value = canvas.toDataURL();
-    $canvas.unbind('mousemove');
 }
 
 function drawLine(e) {
-    mouseXstart = mouseX;
-    mouseYstart = mouseY;
-
     mouseX = e.pageX - e.target.offsetLeft;
     mouseY = e.pageY - e.target.offsetTop;
 
@@ -56,4 +54,7 @@ function drawLine(e) {
     ctx.moveTo(mouseXstart, mouseYstart);
     ctx.lineTo(mouseX, mouseY);
     ctx.stroke();
+
+    mouseXstart = mouseX;
+    mouseYstart = mouseY;
 }
