@@ -1,4 +1,5 @@
 const express = require("express");
+const helmet = require('helmet');
 const app = express();
 const hb = require("express-handlebars");
 
@@ -17,6 +18,8 @@ const { hash, compare } = require("./bcrypt");
 // this configures express to use express-handlebars:
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
+
+app.use(helmet());
 
 // let's you link to the styles.css in public folder:
 app.use(express.static("./public"));
