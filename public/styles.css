@@ -19,3 +19,9 @@ canvas {
     border: 2px solid midnightblue;
     background-color: powderblue;
 }
+
+.err {
+    color: red;
+    font-style: italic;
+    font-weight: bold;
+}

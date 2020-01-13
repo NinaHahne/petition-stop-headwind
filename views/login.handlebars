@@ -1,0 +1,20 @@
+<div class="main-text">
+    <p>Please log in.</p>
+</div>
+
+{{#if err}}
+<div class="err">oops! please try again!</div>
+{{/if}}
+{{#if loginErr}}
+<div class="err">wrong password or email!</div>
+{{/if}}
+<form class="" method="post">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="text" name="email" placeholder="Email Address">
+    <input type="password" name="password" placeholder="Password">
+    <!-- <input type="text" name="password2" placeholder="confirm password"> -->
+
+    <button name="button">LOG IN</button>
+</form>
+
+<p>Not a member yet? <a href="/register">sign up</a> now!</p>

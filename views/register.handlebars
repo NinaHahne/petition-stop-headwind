@@ -1,0 +1,19 @@
+<div class="main-text">
+    <p>A world without <a href="https://en.wiktionary.org/wiki/headwind" target="_blank">headwind</a> on bike lanes is within reach but we won't get there without your support.<br>Join our campain today!</p>
+</div>
+
+{{#if err}}
+<div class="err">oops! please try again!</div>
+{{/if}}
+<form class="" method="post">
+    <input type="text" name="first" placeholder="first name">
+    <input type="text" name="last" placeholder="last name">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="text" name="email" placeholder="Email Address">
+    <input type="password" name="password" placeholder="choose password">
+    <!-- <input type="text" name="password2" placeholder="confirm password"> -->
+
+    <button name="button">SIGN UP</button>
+</form>
+
+<p>If you are already a member, please <a href="/login">log in</a>.</p>
