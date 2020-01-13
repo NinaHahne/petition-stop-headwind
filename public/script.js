@@ -15,6 +15,7 @@ if (canvas) {
             startSignature(e);
             // draw a circle on every mousedown:
             // drawCircle();
+            // draw a dot on every mousedown:
             drawDot();
             $canvas.on("mousemove", e => {
                 drawLine(e);
