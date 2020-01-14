@@ -1,27 +1,58 @@
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    height: 100%;
+    background-color: powderblue;
+}
+
+header, main {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    padding-top: 50px;
+}
+
+main {
+    padding-bottom: 20px;
+}
+
 #wind-vs-bike > img {
     position: relative;
 }
 #headwind-sucks {
     position: relative;
     display: inline-block;
-    width: 180px;
-    height: 180px;
+    width: 190px;
+    height: 190px;
 }
-#headwind-sucks img {
+#wind {
     position: absolute;
-    top: 0;
+    top: 12px;
     left: 0;
 }
 #ban {
+    position: absolute;
     height: 100%;
+    top: 0;
+    left: 0;
 }
 canvas {
     border: 2px solid midnightblue;
     background-color: powderblue;
 }
-
 .err {
     color: red;
     font-style: italic;
     font-weight: bold;
+}
+.container p {
+    text-align: center;
+}
+.form {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
 }
