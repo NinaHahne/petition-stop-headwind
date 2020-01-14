@@ -6,10 +6,10 @@ exports.getSigs = function() {
     return db.query(`SELECT * FROM signatures`).then(({ rows }) => rows);
 };
 
-exports.addSig = function(first, last, sig, tstamp, user_id) {
+exports.addSig = function(sig, tstamp, user_id) {
     return db.query(
-        `INSERT INTO signatures (first, last, signature, time_stamp, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-        [first, last, sig, tstamp, user_id]
+        `INSERT INTO signatures (signature, time_stamp, user_id) VALUES ($1, $2, $3) RETURNING id`,
+        [sig, tstamp, user_id]
     );
 };
 
@@ -25,7 +25,6 @@ exports.getSigID = function(userId) {
         .then(({ rows }) => rows);
 };
 
-
 exports.addUser = function(first, last, email, password) {
     return db.query(
         `INSERT INTO users (first, last, email, password) VALUES ($1, $2, $3, $4) RETURNING id`,
@@ -36,5 +35,28 @@ exports.addUser = function(first, last, email, password) {
 exports.getUser = function(email) {
     return db
         .query(`SELECT * FROM users WHERE email = $1`, [email])
+        .then(({ rows }) => rows);
+};
+
+exports.addProfile = function(age, city, url, user_id) {
+    return db.query(
+        `INSERT INTO user_profiles (age, city, url, user_id) VALUES ($1, $2, $3, $4) RETURNING id`,
+        [age, city, url, user_id]
+    );
+};
+
+// with signatures:
+exports.getSigners = function() {
+    return db.query(`SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url, signatures.signature FROM users JOIN user_profiles ON users.id = user_profiles.user_id JOIN signatures ON user_profiles.user_id = signatures.user_id`).then(({ rows }) => rows);
+};
+
+// without signatures:
+// exports.getSigners = function() {
+//     return db.query(`SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url FROM users JOIN user_profiles ON users.id = user_profiles.user_id JOIN signatures ON user_profiles.user_id = signatures.user_id`).then(({ rows }) => rows);
+// };
+
+exports.getSignersInCity = function(city) {
+    return db
+        .query(`SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url, signatures.signature FROM users JOIN user_profiles ON users.id = user_profiles.user_id JOIN signatures ON user_profiles.user_id = signatures.user_id WHERE LOWER(city) = LOWER($1)`, [city])
         .then(({ rows }) => rows);
 };

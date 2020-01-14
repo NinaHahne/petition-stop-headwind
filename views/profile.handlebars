@@ -1,0 +1,15 @@
+<div class="main-text">
+    <p>Now please tell us just a little bit more about yourself.</p>
+</div>
+
+{{#if err}}
+<div class="err">oops! please try again!</div>
+{{/if}}
+<form class="" method="post">
+    <input type="text" name="age" placeholder="Age">
+    <input type="text" name="city" placeholder="City">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input type="text" name="homepage" placeholder="Homepage">
+
+    <button name="button">CONTINUE</button>
+</form>

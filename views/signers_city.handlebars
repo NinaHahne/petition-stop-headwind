@@ -1,0 +1,16 @@
+<div class="main-text">
+    <p>We the undersigned citizens of {{city}} demand, that <a href="https://en.wiktionary.org/wiki/headwind" target="_blank">headwind</a> be banned on all bike lanes!</p>
+</div>
+
+<div id="signers">
+    {{#signers}}
+        <div class="signer">
+            {{#if url}}
+                <p><a target="_blank" href="{{url}}">{{first}} {{last}}</a> {{age}}</p>
+            {{else}}
+                <p>{{first}} {{last}} {{age}}</p>
+            {{/if}}
+            <img src="{{signature}}" alt="signature">
+        </div>
+    {{/signers}}
+</div>
