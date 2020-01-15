@@ -3,12 +3,20 @@ const helmet = require("helmet");
 const app = express();
 const hb = require("express-handlebars");
 
-const { SESSION_SECRET: sessionSecret } = require("./secrets");
+// const { SESSION_SECRET: sessionSecret } = require("./secrets");
 
 // const cookieParser  = require('cookie-parser');
 // cookie-parser is gone now! we now use cookie session:
 const cookieSession = require("cookie-session");
 const csurf = require("csurf");
+
+let secrets;
+
+if (process.env.NODE_ENV === 'production') {
+    secrets = process.env;
+} else {
+    secrets = require("./secrets");
+}
 
 const {
     addUser,
@@ -50,7 +58,7 @@ app.use(
 
 app.use(
     cookieSession({
-        secret: sessionSecret,
+        secret: secrets.COOKIE_SECRET,
         maxAge: 1000 * 60 * 60 * 24 * 14
     })
 );
