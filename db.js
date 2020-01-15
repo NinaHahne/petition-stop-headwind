@@ -1,6 +1,6 @@
 const spicedPg = require("spiced-pg");
 
-const db = spicedPg("postgres:postgres:postgres@localhost:5432/petition");
+const db = spicedPg(process.env.DATABASE_URL || "postgres:postgres:postgres@localhost:5432/petition");
 
 exports.getSigs = function() {
     return db.query(`SELECT * FROM signatures`).then(({ rows }) => rows);
@@ -63,7 +63,7 @@ exports.getSignersInCity = function(city) {
 
 exports.getProfile = function(user_id) {
     return db
-        .query(`SELECT users.first, users.last, users.email, users.password, user_profiles.age, user_profiles.city, user_profiles.url FROM users JOIN user_profiles ON users.id = user_profiles.user_id WHERE user_id = $1`, [user_id])
+        .query(`SELECT users.first, users.last, users.email, users.password, user_profiles.age, user_profiles.city, user_profiles.url FROM users LEFT OUTER JOIN user_profiles ON users.id = user_profiles.user_id WHERE user_id = $1`, [user_id])
         .then(({ rows }) => rows);
 };
 

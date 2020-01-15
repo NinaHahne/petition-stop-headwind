@@ -347,6 +347,9 @@ app.get("/profile/edit", (req, res) => {
         })
         .catch(err => {
             console.log("err in getProfile in /profile/edit: ", err);
+            res.render("profile_edit", {
+                err
+            });
         });
 });
 
@@ -355,4 +358,4 @@ app.get("/logout", (req, res) => {
     res.redirect("/login");
 });
 
-app.listen(8080, () => console.log("port 8080 listening!"));
+app.listen(process.env.PORT || 8080, () => console.log("port 8080 listening!"));
