@@ -1,0 +1,31 @@
+
+<p>Edit your profile</p>
+
+{{#if err}}
+<div class="err">oops! please try again!</div>
+{{/if}}
+<form class="" method="post">
+    <input type="hidden" name="_csrf" value="{{profile.csrfToken}}">
+    <input type="text" name="first" id="first" placeholder="{{profile.first}}" value="{{profile.first}}"><br>
+    <label for="first">First Name</label><br>
+    <input type="text" name="last" id="last" placeholder="{{profile.last}}" value="{{profile.last}}"><br>
+    <label for="last">Last Name</label><br>
+    <input type="text" name="email" id="email" placeholder="{{profile.email}}" email="{{profile.email}}"><br>
+    <label for="email">Email Address</label><br>
+    <input type="password" name="password" id="password" placeholder="choose new password"><br>
+    <label for="password">New Password</label><br>
+    <input type="text" name="age" id="age" placeholder="{{profile.age}}" value="{{profile.age}}"><br>
+    <label for="age">Age</label><br>
+    <input type="text" name="city" id="city" placeholder="{{profile.city}}" value="{{profile.city}}"><br>
+    <label for="city">City</label><br>
+    <input type="text" name="homepage" id="homepage" placeholder="{{profile.url}}" value="{{profile.url}}"><br>
+    <label for="homepage">Homepage</label><br>
+
+    <button name="button">UPDATE</button>
+</form>
+
+<!-- "To delete signature" make a form and make it look like a link: -->
+<form method="POST" action="/sig/delete">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <button>Delete your signature</button>
+</form>

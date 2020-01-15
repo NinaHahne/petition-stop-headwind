@@ -19,7 +19,8 @@ const {
     getSig,
     addProfile,
     getSigners,
-    getSignersInCity
+    getSignersInCity,
+    getProfile
 } = require("./db");
 
 // for log in:
@@ -121,16 +122,11 @@ app.post("/profile", (req, res) => {
     console.log("*************** /profile POST ***********");
     let url = req.body.homepage;
     if (!(url.startsWith("http://") || url.startsWith("https://"))) {
-        console.log('url of homepage is not safe!');
-        url = '';
+        console.log("url of homepage is not safe!");
+        url = "";
     }
     // insert user's age, city, url into new user_profiles table:
-    addProfile(
-        req.body.age,
-        req.body.city,
-        url,
-        req.session.userId
-    )
+    addProfile(req.body.age, req.body.city, url, req.session.userId)
         .then(() => {
             res.redirect("/petition");
         })
@@ -316,9 +312,9 @@ app.get("/signers", (req, res) => {
 app.get("/signers/:city", (req, res) => {
     console.log("*************** /signers/city Route ***********");
     let city = req.params.city;
-    console.log('city before: ', city);
+    console.log("city before: ", city);
     city[0].toUpperCase();
-    console.log('city after: ', city);
+    console.log("city after: ", city);
 
     getSignersInCity(city)
         .then(signers => {
@@ -333,6 +329,30 @@ app.get("/signers/:city", (req, res) => {
         .catch(err => {
             console.log("err in getSignersInCity in /signers/city: ", err);
         });
+});
+
+// --------------- Part 5: ------------------------------
+app.get("/profile/edit", (req, res) => {
+    console.log("*************** /profile/edit Route***********");
+    let userId = req.session.userId;
+    getProfile(userId)
+        .then(profile => {
+            // console.log("profile: ", profile);
+            profile = profile[0];
+            // console.log("profile.first: ", profile.first);
+            res.render("profile_edit", {
+                layout: "main",
+                profile
+            });
+        })
+        .catch(err => {
+            console.log("err in getProfile in /profile/edit: ", err);
+        });
+});
+
+app.get("/logout", (req, res) => {
+    req.session = null;
+    res.redirect("/login");
 });
 
 app.listen(8080, () => console.log("port 8080 listening!"));
