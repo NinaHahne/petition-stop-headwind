@@ -12,7 +12,7 @@ const csurf = require("csurf");
 
 let secrets;
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
     secrets = process.env;
 } else {
     secrets = require("./secrets");
@@ -28,7 +28,11 @@ const {
     addProfile,
     getSigners,
     getSignersInCity,
-    getProfile
+    getProfile,
+    updateUser3,
+    updateUser4,
+    upsertProfile,
+    deleteSig
 } = require("./db");
 
 // for log in:
@@ -164,8 +168,8 @@ app.post("/login", (req, res) => {
             let userPW = result[0].password;
             let first = result[0].first;
             let last = result[0].last;
-            console.log("userId in users table: ", userId);
-            console.log("userPW safed in user table: ", userPW);
+            // console.log("userId in users table: ", userId);
+            // console.log("userPW safed in user table: ", userPW);
             compare(typedPW, userPW).then(result => {
                 console.log("passwords do match: ", result);
                 if (result) {
@@ -320,9 +324,9 @@ app.get("/signers", (req, res) => {
 app.get("/signers/:city", (req, res) => {
     console.log("*************** /signers/city Route ***********");
     let city = req.params.city;
-    console.log("city before: ", city);
-    city[0].toUpperCase();
-    console.log("city after: ", city);
+    // console.log("city before: ", city);
+    // city = city.charAt(0).toUpperCase() + city.slice(1);
+    // console.log("city after: ", city);
 
     getSignersInCity(city)
         .then(signers => {
@@ -359,6 +363,79 @@ app.get("/profile/edit", (req, res) => {
                 err
             });
         });
+});
+
+app.post("/profile/edit", (req, res) => {
+    console.log("*************** /profile/edit POST***********");
+    let userId = req.session.userId;
+    // console.log('new Name: ', req.body.first);
+    let url = req.body.homepage;
+    if (!(url.startsWith("http://") || url.startsWith("https://"))) {
+        console.log("url of homepage is not safe!");
+        url = "";
+    }
+    if (req.body.password) {
+        console.log('password has been changed!');
+        hash(req.body.password).then(password => {
+            // console.log('hashedPW: ', password);
+            Promise.all([
+                updateUser4(
+                    req.body.first,
+                    req.body.last,
+                    req.body.email,
+                    password,
+                    userId
+                ),
+                upsertProfile(
+                    req.body.age, req.body.city, url, userId
+                )
+            ]).then(() => {
+                let changes = 'changes made successfully!';
+                console.log(changes);
+                res.render("profile_edit", {
+                    changes
+                });
+            }).catch(err => {
+                console.log("err in updateUser4 or upsertProfile in /profile/edit: ", err);
+                res.render("profile_edit", {
+                    err
+                });
+            });
+        });
+    } else {
+        console.log('password stays the same');
+        Promise.all([
+            updateUser3(
+                req.body.first,
+                req.body.last,
+                req.body.email,
+                userId
+            ),
+            upsertProfile(
+                req.body.age, req.body.city, url, userId
+            )
+        ]).then(() => {
+            let changes = 'changes made successfully!';
+            console.log(changes);
+            res.render("profile_edit", {
+                changes
+            });
+        }).catch(err => {
+            console.log("err in updateUser3 or upsertProfile in /profile/edit: ", err);
+            res.render("profile_edit", {
+                err
+            });
+        });
+    }
+});
+
+app.post("/sig/delete", (req, res) => {
+    deleteSig(req.session.signatureId).then(() => {
+        delete req.session.signatureId;
+        res.redirect("/petition");
+    }).catch(err => {
+        console.log("err in deleteSig: ", err);
+    });
 });
 
 app.get("/logout", (req, res) => {

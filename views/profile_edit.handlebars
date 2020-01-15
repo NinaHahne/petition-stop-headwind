@@ -4,13 +4,16 @@
 {{#if err}}
 <div class="err">oops! please try again!</div>
 {{/if}}
-<form class="" method="post">
-    <input type="hidden" name="_csrf" value="{{profile.csrfToken}}">
+{{#if changes}}
+<div class="changes">changes successfully submitted!</div>
+{{/if}}
+<form class="form" method="post">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <input type="text" name="first" id="first" placeholder="{{profile.first}}" value="{{profile.first}}"><br>
     <label for="first">First Name</label><br>
     <input type="text" name="last" id="last" placeholder="{{profile.last}}" value="{{profile.last}}"><br>
     <label for="last">Last Name</label><br>
-    <input type="text" name="email" id="email" placeholder="{{profile.email}}" email="{{profile.email}}"><br>
+    <input type="text" name="email" id="email" placeholder="{{profile.email}}" value="{{profile.email}}"><br>
     <label for="email">Email Address</label><br>
     <input type="password" name="password" id="password" placeholder="choose new password"><br>
     <label for="password">New Password</label><br>

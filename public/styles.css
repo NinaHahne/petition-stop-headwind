@@ -48,11 +48,17 @@ canvas {
     font-style: italic;
     font-weight: bold;
 }
-.container p {
+.container > * {
     text-align: center;
 }
-.form {
+input {
+    margin-top: 10px;
+}
+form button {
+    margin-top: 10px;
+}
+/* .form {
     display: flex;
     align-items: center;
     flex-direction: column;
-}
+} */
