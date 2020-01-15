@@ -58,7 +58,7 @@ app.use(
 
 app.use(
     cookieSession({
-        secret: secrets.COOKIE_SECRET,
+        secret: secrets.SESSION_SECRET,
         maxAge: 1000 * 60 * 60 * 24 * 14
     })
 );
