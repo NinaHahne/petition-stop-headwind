@@ -1,6 +1,8 @@
 const express = require("express");
 const helmet = require("helmet");
 const app = express();
+// to export the app to the supertest:
+exports.app = app;
 const hb = require("express-handlebars");
 
 // const { SESSION_SECRET: sessionSecret } = require("./secrets");
@@ -77,13 +79,13 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.use((req, res, next) => {
-    if (!req.session.userId && req.url != '/login' && req.url != '/register') {
-        res.redirect('/register');
-    } else {
-        next();
-    }
-});
+// app.use((req, res, next) => {
+//     if (!req.session.userId && req.url != '/login' && req.url != '/register') {
+//         res.redirect('/register');
+//     } else {
+//         next();
+//     }
+// });
 
 app.get("/", (req, res) => {
     console.log("*************** / GET ***********");
@@ -182,14 +184,14 @@ app.post("/login", requireLoggedOutUser, (req, res) => {
                     req.session.last = last;
 
                     // get users signature id and put in session if exists:
-                    console.log("userId: ", userId);
+                    // console.log("userId: ", userId);
                     getSigID(userId)
                         .then(signatureId => {
                             // only happening when signatureId does exist
-                            console.log(
-                                "signatureId in signatures table: ",
-                                signatureId[0].id
-                            );
+                            // console.log(
+                            //     "signatureId in signatures table: ",
+                            //     signatureId[0].id
+                            // );
                             req.session.signatureId = signatureId[0].id;
                             res.redirect("/thanks");
                         })
@@ -216,29 +218,42 @@ app.post("/login", requireLoggedOutUser, (req, res) => {
         });
 });
 
-app.get("/petition", requireNoSignature, (req, res) => {
+app.get("/petition", requireLoggedInUser, requireNoSignature, (req, res) => {
     console.log("*************** /petition GET ***********");
+    let first = req.session.first;
+    let last = req.session.last;
     // console.log('this is the cookie session in petition route: ', req.session);
     // if user is logged in:
-    if (req.session.userId) {
-        let first = req.session.first;
-        let last = req.session.last;
-        // if user already has a signatureId in their cookies, send them to /thanks
-        if (req.session.signatureId) {
-            console.log("redirect to /thanks from /petition happening");
-            res.redirect("/thanks");
-        } else {
-            res.render("petition", {
-                layout: "main",
-                first,
-                last
-            });
-        }
-    } else {
-        // if user is not logged in:
-        res.redirect("/register");
-    }
+    res.render("petition", {
+        layout: "main",
+        first,
+        last
+    });
 });
+
+// app.get("/petition", requireNoSignature, (req, res) => {
+//     console.log("*************** /petition GET ***********");
+//     // console.log('this is the cookie session in petition route: ', req.session);
+//     // if user is logged in:
+//     if (req.session.userId) {
+//         let first = req.session.first;
+//         let last = req.session.last;
+//         // if user already has a signatureId in their cookies, send them to /thanks
+//         if (req.session.signatureId) {
+//             console.log("redirect to /thanks from /petition happening");
+//             res.redirect("/thanks");
+//         } else {
+//             res.render("petition", {
+//                 layout: "main",
+//                 first,
+//                 last
+//             });
+//         }
+//     } else {
+//         // if user is not logged in:
+//         res.redirect("/register");
+//     }
+// });
 
 app.post("/petition", requireNoSignature, (req, res) => {
     console.log("*************** /petition POST ***********");
@@ -427,4 +442,9 @@ app.get("/logout", requireLoggedInUser, (req, res) => {
     res.redirect("/login");
 });
 
-app.listen(process.env.PORT || 8080, () => console.log("port 8080 listening!"));
+// to make supertest possible:
+console.log(require.main == module);
+// only if someona calls "node ."" or "node index.js", will not run, when just called within a test module:
+if (require.main == module) {
+    app.listen(process.env.PORT || 8080, () => console.log("port 8080 listening!"));
+}
