@@ -1,5 +1,7 @@
 * {
     box-sizing: border-box;
+    /* font-family: 'Raleway', sans-serif; */
+    font-family: 'Roboto', sans-serif;
 }
 
 html, body {
@@ -38,6 +40,12 @@ main {
     height: 100%;
     top: 0;
     left: 0;
+}
+.main-text {
+    font-family: 'Raleway', sans-serif;
+    color: midnightblue;
+    font-size: 22px;
+    font-weight: bold;
 }
 canvas {
     border: 2px solid midnightblue;
