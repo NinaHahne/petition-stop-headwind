@@ -6,7 +6,8 @@ const hb = require("express-handlebars");
 // const { SESSION_SECRET: sessionSecret } = require("./secrets");
 
 // const cookieParser  = require('cookie-parser');
-// cookie-parser is gone now! we now use cookie session:
+// cookie-parser is gone now! we now use cookie session..
+// creates two cookies: second one is an encrypred copy of the first, that makes it temper-proof:
 const cookieSession = require("cookie-session");
 const csurf = require("csurf");
 
@@ -35,6 +36,13 @@ const {
     deleteSig
 } = require("./db");
 
+const {
+    requireLoggedInUser,
+    requireLoggedOutUser,
+    requireSignature,
+    requireNoSignature
+} = require('./middleware');
+
 // for log in:
 const { hash, compare } = require("./bcrypt");
 
@@ -54,12 +62,6 @@ app.use(
     })
 );
 
-// app.use(cookieParser());
-// app.use(cookieSession({
-//     secret: `I'm always hungry.`,
-//     maxAge: 1000 * 60 * 60 * 24 * 14
-// }));
-
 app.use(
     cookieSession({
         secret: secrets.SESSION_SECRET,
@@ -75,25 +77,28 @@ app.use(function(req, res, next) {
     next();
 });
 
+app.use((req, res, next) => {
+    if (!req.session.userId && req.url != '/login' && req.url != '/register') {
+        res.redirect('/register');
+    } else {
+        next();
+    }
+});
+
 app.get("/", (req, res) => {
-    console.log("*************** / Route ***********");
-    // console.log('req.session before setting: ', req.session);
-    req.session.peppermint = "<3";
-    // creates two cookies: second one is an encrypred copy of the first, that makes it temper-proof
-    // console.log('req.session after setting: ', req.session);
-    //
-    // console.log("*************** / Route ***********");
+    console.log("*************** / GET ***********");
     res.redirect("/petition");
 });
 // ------------------- adding log in:-------------------------
-app.get("/register", (req, res) => {
-    // console.log("*************** /register Route ***********");
+app.get("/register", requireLoggedOutUser, (req, res) => {
+    console.log("*************** /register GET ***********");
     res.render("register", {
         layout: "main"
     });
 });
 
-app.post("/register", (req, res) => {
+app.post("/register", requireLoggedOutUser, (req, res) => {
+    console.log("*************** /register POST ***********");
     // console.log(`your name is: ${req.body.first} ${req.body.last}`);
     hash(req.body.password)
         .then(password => {
@@ -103,7 +108,6 @@ app.post("/register", (req, res) => {
                 req.body.email,
                 password
             ).then(result => {
-                console.log("*************** /register POST ***********");
                 // console.log('result which includes the RETURNING data: ', result);
                 // GET ACTUAL ID HERE:
                 let id = result.rows[0].id;
@@ -111,26 +115,25 @@ app.post("/register", (req, res) => {
                 req.session.userId = id;
                 req.session.first = req.body.first;
                 req.session.last = req.body.last;
-                // console.log("*************** /register POST ***********");
                 res.redirect("/profile");
             });
         })
         .catch(err => {
-            console.log("err in /register: ", err);
+            console.log("err in /register POST: ", err);
             res.render("register", {
                 err
             });
         });
 });
 
-app.get("/profile", (req, res) => {
-    // console.log("*************** /profile Route ***********");
+app.get("/profile", requireLoggedInUser, (req, res) => {
+    console.log("*************** /profile GET ***********");
     res.render("profile", {
         layout: "main"
     });
 });
 
-app.post("/profile", (req, res) => {
+app.post("/profile", requireLoggedInUser, (req, res) => {
     console.log("*************** /profile POST ***********");
     let url = req.body.homepage;
     if (!(url.startsWith("http://") || url.startsWith("https://"))) {
@@ -143,27 +146,27 @@ app.post("/profile", (req, res) => {
             res.redirect("/petition");
         })
         .catch(err => {
-            console.log("err in /profile: ", err);
+            console.log("err in /profile POST: ", err);
             res.render("profile", {
                 err
             });
         });
 });
 
-app.get("/login", (req, res) => {
-    // console.log("*************** /login Route ***********");
+app.get("/login", requireLoggedOutUser, (req, res) => {
+    console.log("*************** /login GET ***********");
     res.render("login", {
         layout: "main"
     });
 });
 
-app.post("/login", (req, res) => {
+app.post("/login", requireLoggedOutUser, (req, res) => {
+    console.log("*************** /login POST ***********");
     // console.log(`your name is: ${req.body.first} ${req.body.last}`);
     let typedPW = req.body.password;
     //  ****CHANGE getUser to querie: JOIN users and signatures to get info about logged in user (password, signature)
     getUser(req.body.email)
         .then(result => {
-            console.log("*************** /login POST ***********");
             let userId = result[0].id;
             let userPW = result[0].password;
             let first = result[0].first;
@@ -189,10 +192,6 @@ app.post("/login", (req, res) => {
                             );
                             req.session.signatureId = signatureId[0].id;
                             res.redirect("/thanks");
-                            // if (signatureId) {
-                            //     console.log('signatureId in signatures table: ', signatureId[0].id);
-                            //     req.session.signatureId = signatureId[0].id;
-                            // }
                         })
                         .catch(err => {
                             // happening when signatureId does NOT exist (or there is another error)
@@ -217,8 +216,8 @@ app.post("/login", (req, res) => {
         });
 });
 
-app.get("/petition", (req, res) => {
-    console.log("*************** /petition Route ***********");
+app.get("/petition", requireNoSignature, (req, res) => {
+    console.log("*************** /petition GET ***********");
     // console.log('this is the cookie session in petition route: ', req.session);
     // if user is logged in:
     if (req.session.userId) {
@@ -241,39 +240,36 @@ app.get("/petition", (req, res) => {
     }
 });
 
-app.post("/petition", (req, res) => {
+app.post("/petition", requireNoSignature, (req, res) => {
+    console.log("*************** /petition POST ***********");
     // console.log(`your name is: ${req.body.first} ${req.body.last}`);
     let timeStamp = new Date();
     addSig(req.body.sig, timeStamp, req.session.userId)
         .then(result => {
-            console.log("*************** /petition POST ***********");
             // console.log('timeStamp: ', timeStamp);
             // console.log('result which includes the RETURNING data: ', result);
             // GET ACTUAL ID HERE:
             let id = result.rows[0].id;
             // console.log(id);
-
             req.session.signatureId = id;
-            // console.log("*************** /petition POST ***********");
             res.redirect("/thanks");
         })
         .catch(err => {
-            console.log("err in POST /petition: ", err);
+            console.log("err in /petition POST: ", err);
             res.render("petition", {
                 err
             });
         });
 });
 
-app.get("/thanks", (req, res) => {
+app.get("/thanks", requireSignature, (req, res) => {
     console.log("*************** /thanks Route ***********");
     // console.log('req.session.signatureId: ', req.session.signatureId);
     let signatureId = req.session.signatureId;
-
     getSigs()
         .then(signers => {
             console.log("*************** /thanks Route ***********");
-            console.log("signers.length: ", signers.length);
+            // console.log("signers.length: ", signers.length);
             let numberOfSigners = signers.length;
             getSig(signatureId)
                 .then(result => {
@@ -294,22 +290,10 @@ app.get("/thanks", (req, res) => {
         });
 });
 
-app.get("/signers", (req, res) => {
-    // getSigs()
-    //     .then(signers => {
-    //         console.log("*************** /signers Route ***********");
-    //         // console.log(signers);
-    //         res.render("signers", {
-    //             layout: "main",
-    //             signers
-    //         });
-    //     })
-    //     .catch(err => {
-    //         console.log("err in getSigs in /signers: ", err);
-    //     });
+app.get("/signers", requireSignature, (req, res) => {
+    console.log("*************** /signers GET ***********");
     getSigners()
         .then(signers => {
-            console.log("*************** /signers Route ***********");
             // console.log(signers);
             res.render("signers", {
                 layout: "main",
@@ -321,16 +305,14 @@ app.get("/signers", (req, res) => {
         });
 });
 
-app.get("/signers/:city", (req, res) => {
-    console.log("*************** /signers/city Route ***********");
+app.get("/signers/:city", requireSignature, (req, res) => {
+    console.log("*************** /signers/city GET ***********");
     let city = req.params.city;
     // console.log("city before: ", city);
     // city = city.charAt(0).toUpperCase() + city.slice(1);
     // console.log("city after: ", city);
-
     getSignersInCity(city)
         .then(signers => {
-            console.log("*************** /signers/city Route ***********");
             // console.log(signers);
             res.render("signers_city", {
                 layout: "main",
@@ -344,7 +326,7 @@ app.get("/signers/:city", (req, res) => {
 });
 
 // --------------- Part 5: ------------------------------
-app.get("/profile/edit", (req, res) => {
+app.get("/profile/edit", requireLoggedInUser, (req, res) => {
     console.log("*************** /profile/edit Route***********");
     let userId = req.session.userId;
     getProfile(userId)
@@ -365,7 +347,7 @@ app.get("/profile/edit", (req, res) => {
         });
 });
 
-app.post("/profile/edit", (req, res) => {
+app.post("/profile/edit", requireLoggedInUser, (req, res) => {
     console.log("*************** /profile/edit POST***********");
     let userId = req.session.userId;
     // console.log('new Name: ', req.body.first);
@@ -429,7 +411,8 @@ app.post("/profile/edit", (req, res) => {
     }
 });
 
-app.post("/sig/delete", (req, res) => {
+app.post("/sig/delete", requireSignature, (req, res) => {
+    console.log("*************** /sig/delete POST***********");
     deleteSig(req.session.signatureId).then(() => {
         delete req.session.signatureId;
         res.redirect("/petition");
@@ -438,7 +421,8 @@ app.post("/sig/delete", (req, res) => {
     });
 });
 
-app.get("/logout", (req, res) => {
+app.get("/logout", requireLoggedInUser, (req, res) => {
+    console.log("*************** /logout ***********");
     req.session = null;
     res.redirect("/login");
 });

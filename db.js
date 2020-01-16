@@ -51,7 +51,6 @@ exports.addProfile = function(age, city, url, user_id) {
     );
 };
 
-// with signatures:
 exports.getSigners = function() {
     return db
         .query(
@@ -62,11 +61,6 @@ exports.getSigners = function() {
         )
         .then(({ rows }) => rows);
 };
-
-// without signatures:
-// exports.getSigners = function() {
-//     return db.query(`SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url FROM users JOIN user_profiles ON users.id = user_profiles.user_id JOIN signatures ON user_profiles.user_id = signatures.user_id`).then(({ rows }) => rows);
-// };
 
 exports.getSignersInCity = function(city) {
     return db
@@ -128,16 +122,3 @@ exports.deleteSig = function(signatureId) {
     return db.query(
         `DELETE FROM signatures WHERE id = $1`, [signatureId]);
 };
-
-// PART 5:
-// INSERT INTO user_profiles (age, city, url, user_id) VALUES ($1, $2, $3, $4);
-//
-// UPDATE user_profiles SET age = $1, city = $2, url = $3 WHERE user_id = $4;
-//
-// "UPSERT" (update/insert if exists):
-// INSERT INTO user_profiles (age, city, url, user_id)
-// VALUES ($1, $2, $3, $4)
-// ON CONFLICT (user_id)
-// DO UPDATE user_profiles SET age = $1, city = $2, url = $3;
-
-// DELETE FROM users WHERE id = $1;
