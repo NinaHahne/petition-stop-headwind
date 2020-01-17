@@ -43,7 +43,7 @@ const {
     requireLoggedOutUser,
     requireSignature,
     requireNoSignature
-} = require('./middleware');
+} = require("./middleware");
 
 // for log in:
 const { hash, compare } = require("./bcrypt");
@@ -372,7 +372,7 @@ app.post("/profile/edit", requireLoggedInUser, (req, res) => {
         url = "";
     }
     if (req.body.password) {
-        console.log('password has been changed!');
+        console.log("password has been changed!");
         hash(req.body.password).then(password => {
             // console.log('hashedPW: ', password);
             Promise.all([
@@ -383,57 +383,60 @@ app.post("/profile/edit", requireLoggedInUser, (req, res) => {
                     password,
                     userId
                 ),
-                upsertProfile(
-                    req.body.age, req.body.city, url, userId
-                )
-            ]).then(() => {
-                let changes = 'changes made successfully!';
+                upsertProfile(req.body.age, req.body.city, url, userId)
+            ])
+                .then(() => {
+                    let changes = "changes made successfully!";
+                    console.log(changes);
+                    res.render("profile_edit", {
+                        changes
+                    });
+                })
+                .catch(err => {
+                    console.log(
+                        "err in updateUser4 or upsertProfile in /profile/edit: ",
+                        err
+                    );
+                    res.render("profile_edit", {
+                        err
+                    });
+                });
+        });
+    } else {
+        console.log("password stays the same");
+        Promise.all([
+            updateUser3(req.body.first, req.body.last, req.body.email, userId),
+            upsertProfile(req.body.age, req.body.city, url, userId)
+        ])
+            .then(() => {
+                let changes = "changes made successfully!";
                 console.log(changes);
                 res.render("profile_edit", {
                     changes
                 });
-            }).catch(err => {
-                console.log("err in updateUser4 or upsertProfile in /profile/edit: ", err);
+            })
+            .catch(err => {
+                console.log(
+                    "err in updateUser3 or upsertProfile in /profile/edit: ",
+                    err
+                );
                 res.render("profile_edit", {
                     err
                 });
             });
-        });
-    } else {
-        console.log('password stays the same');
-        Promise.all([
-            updateUser3(
-                req.body.first,
-                req.body.last,
-                req.body.email,
-                userId
-            ),
-            upsertProfile(
-                req.body.age, req.body.city, url, userId
-            )
-        ]).then(() => {
-            let changes = 'changes made successfully!';
-            console.log(changes);
-            res.render("profile_edit", {
-                changes
-            });
-        }).catch(err => {
-            console.log("err in updateUser3 or upsertProfile in /profile/edit: ", err);
-            res.render("profile_edit", {
-                err
-            });
-        });
     }
 });
 
 app.post("/sig/delete", requireSignature, (req, res) => {
     console.log("*************** /sig/delete POST***********");
-    deleteSig(req.session.signatureId).then(() => {
-        delete req.session.signatureId;
-        res.redirect("/petition");
-    }).catch(err => {
-        console.log("err in deleteSig: ", err);
-    });
+    deleteSig(req.session.signatureId)
+        .then(() => {
+            delete req.session.signatureId;
+            res.redirect("/petition");
+        })
+        .catch(err => {
+            console.log("err in deleteSig: ", err);
+        });
 });
 
 app.get("/logout", requireLoggedInUser, (req, res) => {
@@ -446,5 +449,7 @@ app.get("/logout", requireLoggedInUser, (req, res) => {
 console.log(require.main == module);
 // only if someona calls "node ."" or "node index.js", will not run, when just called within a test module:
 if (require.main == module) {
-    app.listen(process.env.PORT || 8080, () => console.log("port 8080 listening!"));
+    app.listen(process.env.PORT || 8080, () =>
+        console.log("port 8080 listening!")
+    );
 }
