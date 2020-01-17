@@ -10,8 +10,18 @@
         <link href="https://fonts.googleapis.com/css?family=Raleway:400,600|Roboto:400,400i" rel="stylesheet">
 
     </head>
+    <header>
+        {{#if loginBtn}}
+            {{>login-btn}}
+        {{else}}
+            {{>logout-btn}}
+        {{/if}}
+        {{#if editBtn}}
+            {{>edit-btn}}
+        {{/if}}
+    </header>
     <body>
-        <header>
+        <section class='logo'>
             <div id="wind-vs-bike">
                 <div id="headwind-sucks">
                     <img id="wind" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/google/56/dash-symbol_1f4a8.png" alt="stupid headwind">
@@ -19,7 +29,7 @@
                 </div>
                 <img src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/google/223/bicyclist_1f6b4.png" alt="bicyclist">
             </div>
-        </header>
+        </section>
 
         <main>
             <div class="container">

@@ -1,3 +1,8 @@
+// TO DO:
+// change the query in /profile to upsertProfile
+// querystring search in /profile/edit if err
+// add password double check
+
 const express = require("express");
 const helmet = require("helmet");
 const app = express();
@@ -95,7 +100,8 @@ app.get("/", (req, res) => {
 app.get("/register", requireLoggedOutUser, (req, res) => {
     console.log("*************** /register GET ***********");
     res.render("register", {
-        layout: "main"
+        layout: "main",
+        loginBtn: true
     });
 });
 
@@ -123,6 +129,7 @@ app.post("/register", requireLoggedOutUser, (req, res) => {
         .catch(err => {
             console.log("err in /register POST: ", err);
             res.render("register", {
+                loginBtn: true,
                 err
             });
         });
@@ -131,7 +138,8 @@ app.post("/register", requireLoggedOutUser, (req, res) => {
 app.get("/profile", requireLoggedInUser, (req, res) => {
     console.log("*************** /profile GET ***********");
     res.render("profile", {
-        layout: "main"
+        layout: "main",
+        logoutBtn: true
     });
 });
 
@@ -150,6 +158,7 @@ app.post("/profile", requireLoggedInUser, (req, res) => {
         .catch(err => {
             console.log("err in /profile POST: ", err);
             res.render("profile", {
+                logoutBtn: true,
                 err
             });
         });
@@ -158,7 +167,8 @@ app.post("/profile", requireLoggedInUser, (req, res) => {
 app.get("/login", requireLoggedOutUser, (req, res) => {
     console.log("*************** /login GET ***********");
     res.render("login", {
-        layout: "main"
+        layout: "main",
+        loginBtn: true
     });
 });
 
@@ -205,6 +215,7 @@ app.post("/login", requireLoggedOutUser, (req, res) => {
                     let loginErr = "wrong password or email!";
                     console.log(loginErr);
                     res.render("login", {
+                        loginBtn: true,
                         loginErr
                     });
                 }
@@ -213,6 +224,7 @@ app.post("/login", requireLoggedOutUser, (req, res) => {
         .catch(err => {
             console.log("err in /login: ", err);
             res.render("login", {
+                loginBtn: true,
                 err
             });
         });
@@ -226,6 +238,7 @@ app.get("/petition", requireLoggedInUser, requireNoSignature, (req, res) => {
     // if user is logged in:
     res.render("petition", {
         layout: "main",
+        logoutBtn: true,
         first,
         last
     });
@@ -272,12 +285,13 @@ app.post("/petition", requireNoSignature, (req, res) => {
         .catch(err => {
             console.log("err in /petition POST: ", err);
             res.render("petition", {
+
                 err
             });
         });
 });
 
-app.get("/thanks", requireSignature, (req, res) => {
+app.get("/thanks", requireLoggedInUser, requireSignature, (req, res) => {
     console.log("*************** /thanks Route ***********");
     // console.log('req.session.signatureId: ', req.session.signatureId);
     let signatureId = req.session.signatureId;
@@ -292,6 +306,7 @@ app.get("/thanks", requireSignature, (req, res) => {
                     // console.log('sigUrl: ', sigUrl);
                     res.render("thanks", {
                         layout: "main",
+                        editBtn: true,
                         sigUrl,
                         numberOfSigners
                     });
@@ -305,13 +320,15 @@ app.get("/thanks", requireSignature, (req, res) => {
         });
 });
 
-app.get("/signers", requireSignature, (req, res) => {
+app.get("/signers", requireLoggedInUser, requireSignature, (req, res) => {
     console.log("*************** /signers GET ***********");
     getSigners()
         .then(signers => {
             // console.log(signers);
             res.render("signers", {
                 layout: "main",
+                logoutBtn: true,
+                editBtn: true,
                 signers
             });
         })
@@ -320,7 +337,7 @@ app.get("/signers", requireSignature, (req, res) => {
         });
 });
 
-app.get("/signers/:city", requireSignature, (req, res) => {
+app.get("/signers/:city", requireLoggedInUser, requireSignature, (req, res) => {
     console.log("*************** /signers/city GET ***********");
     let city = req.params.city;
     // console.log("city before: ", city);
@@ -331,6 +348,8 @@ app.get("/signers/:city", requireSignature, (req, res) => {
             // console.log(signers);
             res.render("signers_city", {
                 layout: "main",
+                logoutBtn: true,
+                editBtn: true,
                 signers,
                 city
             });
@@ -351,12 +370,14 @@ app.get("/profile/edit", requireLoggedInUser, (req, res) => {
             // console.log("profile.first: ", profile.first);
             res.render("profile_edit", {
                 layout: "main",
+                logoutBtn: true,
                 profile
             });
         })
         .catch(err => {
             console.log("err in getProfile in /profile/edit: ", err);
             res.render("profile_edit", {
+                logoutBtn: true,
                 err
             });
         });
@@ -389,6 +410,7 @@ app.post("/profile/edit", requireLoggedInUser, (req, res) => {
                     let changes = "changes made successfully!";
                     console.log(changes);
                     res.render("profile_edit", {
+                        logoutBtn: true,
                         changes
                     });
                 })
@@ -398,6 +420,7 @@ app.post("/profile/edit", requireLoggedInUser, (req, res) => {
                         err
                     );
                     res.render("profile_edit", {
+                        logoutBtn: true,
                         err
                     });
                 });
@@ -412,6 +435,7 @@ app.post("/profile/edit", requireLoggedInUser, (req, res) => {
                 let changes = "changes made successfully!";
                 console.log(changes);
                 res.render("profile_edit", {
+                    logoutBtn: true,
                     changes
                 });
             })
@@ -421,13 +445,14 @@ app.post("/profile/edit", requireLoggedInUser, (req, res) => {
                     err
                 );
                 res.render("profile_edit", {
+                    logoutBtn: true,
                     err
                 });
             });
     }
 });
 
-app.post("/sig/delete", requireSignature, (req, res) => {
+app.post("/sig/delete", requireLoggedInUser, requireSignature, (req, res) => {
     console.log("*************** /sig/delete POST***********");
     deleteSig(req.session.signatureId)
         .then(() => {
@@ -446,7 +471,7 @@ app.get("/logout", requireLoggedInUser, (req, res) => {
 });
 
 // to make supertest possible:
-console.log(require.main == module);
+// console.log(require.main == module);
 // only if someona calls "node ."" or "node index.js", will not run, when just called within a test module:
 if (require.main == module) {
     app.listen(process.env.PORT || 8080, () =>
