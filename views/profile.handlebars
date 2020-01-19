@@ -6,10 +6,13 @@
 <div class="err">oops! please try again!</div>
 {{/if}}
 <form class="" method="post">
-    <input type="text" name="age" placeholder="Age">
-    <input type="text" name="city" placeholder="City">
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
-    <input type="text" name="homepage" placeholder="Homepage">
+    <input type="text" name="age" id="age" placeholder="optional"><br>
+    <label for="age">Age</label><br>
+    <input type="text" name="city" id="city" placeholder="optional"><br>
+    <label for="city">City</label><br>
+    <input type="text" name="homepage" id="homepage" placeholder="optional"><br>
+    <label for="homepage">Homepage</label><br>
 
     <button name="button">CONTINUE</button>
 </form>

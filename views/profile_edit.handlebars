@@ -10,22 +10,24 @@
 {{/if}}
 <form class="form" method="post">
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
-    <input type="text" name="first" id="first" placeholder="{{profile.first}}" value="{{profile.first}}"><br>
+    <input type="text" name="first" id="first" placeholder="required" value="{{profile.first}}"><br>
     <label for="first">First Name</label><br>
-    <input type="text" name="last" id="last" placeholder="{{profile.last}}" value="{{profile.last}}"><br>
+    <input type="text" name="last" id="last" placeholder="required" value="{{profile.last}}"><br>
     <label for="last">Last Name</label><br>
-    <input type="text" name="email" id="email" placeholder="{{profile.email}}" value="{{profile.email}}"><br>
+    <input type="text" name="email" id="email" placeholder="required" value="{{profile.email}}"><br>
     <label for="email">Email Address</label><br>
     <input type="password" name="password" id="password" placeholder="choose new password"><br>
     <label for="password">New Password</label><br>
-    <input type="text" name="age" id="age" placeholder="{{profile.age}}" value="{{profile.age}}"><br>
+    <input type="text" name="age" id="age" placeholder="optional" value="{{profile.age}}"><br>
     <label for="age">Age</label><br>
-    <input type="text" name="city" id="city" placeholder="{{profile.city}}" value="{{profile.city}}"><br>
+    <input type="text" name="city" id="city" placeholder="optional" value="{{profile.city}}"><br>
     <label for="city">City</label><br>
-    <input type="text" name="homepage" id="homepage" placeholder="{{profile.url}}" value="{{profile.url}}"><br>
+    <input type="text" name="homepage" id="homepage" placeholder="optional" value="{{profile.url}}"><br>
     <label for="homepage">Homepage</label><br>
 
     <button name="button">UPDATE</button>
 </form>
 
-{{>delete-sig-btn}}
+{{#if signatureId}}
+    {{>delete-sig-btn}}
+{{/if}}
