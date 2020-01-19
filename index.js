@@ -150,7 +150,11 @@ app.post("/profile", requireLoggedInUser, (req, res) => {
         url = "";
     }
     // insert user's age, city, url into new user_profiles table:
-    addProfile(req.body.age, req.body.city, url, req.session.userId)
+    let age = req.body.age;
+    if (age === '') {
+        age = null;
+    }
+    addProfile(age, req.body.city, url, req.session.userId)
         .then(() => {
             res.redirect("/petition");
         })
@@ -269,6 +273,8 @@ app.post("/petition", requireNoSignature, (req, res) => {
     console.log("*************** /petition POST ***********");
     // console.log(`your name is: ${req.body.first} ${req.body.last}`);
     let timeStamp = new Date();
+    let first = req.session.first;
+    let last = req.session.last;
     addSig(req.body.sig, timeStamp, req.session.userId)
         .then(result => {
             // console.log('timeStamp: ', timeStamp);
@@ -282,7 +288,9 @@ app.post("/petition", requireNoSignature, (req, res) => {
         .catch(err => {
             console.log("err in /petition POST: ", err);
             res.render("petition", {
-                err
+                err,
+                first,
+                last
             });
         });
 });
@@ -391,6 +399,10 @@ app.post("/profile/edit", requireLoggedInUser, (req, res) => {
     // console.log('new Name: ', req.body.first);
     let signatureId = req.session.signatureId;
     let url = req.body.homepage;
+    let age = req.body.age;
+    if (age === '') {
+        age = null;
+    }
     if (!(url.startsWith("http://") || url.startsWith("https://"))) {
         console.log("url of homepage is not safe!");
         url = "";
@@ -407,7 +419,7 @@ app.post("/profile/edit", requireLoggedInUser, (req, res) => {
                     password,
                     userId
                 ),
-                upsertProfile(req.body.age, req.body.city, url, userId)
+                upsertProfile(age, req.body.city, url, userId)
             ])
                 .then(() => {
                     let changes = "changes made successfully!";
