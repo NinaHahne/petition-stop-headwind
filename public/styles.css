@@ -18,13 +18,14 @@ header {
 }
 header .btn {
     display: inline-block;
-    color: powderblue;
+    /* color: powderblue; */
     font-weight: bold;
     margin-left: 10px;
     margin-right: 10px;
 }
 header a {
     text-decoration: none;
+    color: powderblue;
 }
 header a:visited {
     color: powderblue;

@@ -240,6 +240,7 @@ app.get("/petition", requireLoggedInUser, requireNoSignature, (req, res) => {
     // if user is logged in:
     res.render("petition", {
         layout: "main",
+        editBtn: true,
         first,
         last
     });
@@ -289,6 +290,7 @@ app.post("/petition", requireNoSignature, (req, res) => {
             console.log("err in /petition POST: ", err);
             res.render("petition", {
                 err,
+                editBtn: true,
                 first,
                 last
             });
