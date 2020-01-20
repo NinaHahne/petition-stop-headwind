@@ -10,6 +10,10 @@ const app = express();
 exports.app = app;
 const hb = require("express-handlebars");
 
+// to get querystrings in urls:
+const url = require("url");
+const querystring = require("querystring");
+
 // const { SESSION_SECRET: sessionSecret } = require("./secrets");
 
 // const cookieParser  = require('cookie-parser');
