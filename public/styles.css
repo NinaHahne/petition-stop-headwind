@@ -113,3 +113,6 @@ form {
     align-items: center;
     flex-direction: column;
 } */
+.signer {
+    margin: 5px 10px;
+}
