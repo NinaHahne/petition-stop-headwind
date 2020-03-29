@@ -1,5 +1,5 @@
 # Petition - Stop Headwind
-authenticated petition website built with handlebars
+Authenticated petition website built with handlebars
 
 sign the petition for a world without headwind on bike lanes:
 https://stopheadwind.herokuapp.com/
